@@ -22,6 +22,7 @@ public class gui extends JFrame {
     public gui() {
         setTitle("Schiffe Versenken");
         setSize(850, 450);
+        setMinimumSize(new Dimension(850, 450));
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
 
@@ -32,13 +33,18 @@ public class gui extends JFrame {
 
         JPanel playerPanel = new JPanel(new GridLayout(GRID_SIZE, GRID_SIZE));
         JPanel computerPanel = new JPanel(new GridLayout(GRID_SIZE, GRID_SIZE));
+        JPanel SeparatorPanel = new JPanel(new GridLayout(3, 1));
+
+        SeparatorPanel.setBorder(BorderFactory.createLineBorder(Color.red));
+        SeparatorPanel.add(new JLabel("Schiffe Versenken", SwingConstants.CENTER));
+        SeparatorPanel.add(new JLabel(new ImageIcon("images/ship.jpg")));
 
         initializeGrid(playerGrid, playerPanel, true);
         initializeGrid(computerGrid, computerPanel, false);
 
         JPanel gridPanel = new JPanel(new GridLayout(1, 3));
         gridPanel.add(playerPanel);
-        gridPanel.add(new SeparatorPanel());
+        gridPanel.add(SeparatorPanel);
         gridPanel.add(computerPanel);
 
         add(gridPanel, BorderLayout.CENTER);
@@ -61,7 +67,7 @@ public class gui extends JFrame {
         for (int row = 0; row < GRID_SIZE; row++) {
             for (int col = 0; col < GRID_SIZE; col++) {
                 grid[row][col] = new JButton();
-                grid[row][col].setBackground(Color.BLUE);
+                grid[row][col].setBackground(Color.CYAN);
                 grid[row][col].setOpaque(true);
                 grid[row][col].setPreferredSize(new Dimension(30, 30));
                 int finalRow = row;
@@ -82,10 +88,10 @@ public class gui extends JFrame {
             if (canPlaceShip(playerShips, row, col, shipSize, horizontalPlacement)) {
                 for (int i = 0; i < shipSize; i++) {
                     if (horizontalPlacement) {
-                        playerGrid[row][col + i].setBackground(Color.GRAY);
+                        playerGrid[row][col + i].setBackground(Color.DARK_GRAY);
                         playerShips[row][col + i] = currentShipIndex + 1; // Mark the ship index
                     } else {
-                        playerGrid[row + i][col].setBackground(Color.GRAY);
+                        playerGrid[row + i][col].setBackground(Color.DARK_GRAY);
                         playerShips[row + i][col] = currentShipIndex + 1; // Mark the ship index
                     }
                 }
@@ -212,19 +218,5 @@ public class gui extends JFrame {
 
     public static void main(String[] args) {
         new gui();
-    }
-}
-
-class SeparatorPanel extends JPanel {
-    @Override
-    protected void paintComponent(Graphics g) {
-        super.paintComponent(g);
-        g.setColor(Color.RED);
-        g.fillRect(getWidth() / 2 - 1, 0, 2, getHeight());
-    }
-
-    @Override
-    public Dimension getPreferredSize() {
-        return new Dimension(5, 0);
     }
 }
