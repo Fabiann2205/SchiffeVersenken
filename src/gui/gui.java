@@ -83,10 +83,10 @@ public class gui extends JFrame {
                 for (int i = 0; i < shipSize; i++) {
                     if (horizontalPlacement) {
                         playerGrid[row][col + i].setBackground(Color.GRAY);
-                        playerShips[row][col + i] = 1;
+                        playerShips[row][col + i] = currentShipIndex + 1; // Mark the ship index
                     } else {
                         playerGrid[row + i][col].setBackground(Color.GRAY);
-                        playerShips[row + i][col] = 1;
+                        playerShips[row + i][col] = currentShipIndex + 1; // Mark the ship index
                     }
                 }
                 playerShipsRemaining += shipSize;
@@ -109,16 +109,18 @@ public class gui extends JFrame {
                 if (canPlaceShip(computerShips, row, col, shipSize, horizontal)) {
                     for (int i = 0; i < shipSize; i++) {
                         if (horizontal) {
-                            computerShips[row][col + i] = 1;
+                            computerShips[row][col + i] = currentShipIndex + 1; // Mark the ship index
                         } else {
-                            computerShips[row + i][col] = 1;
+                            computerShips[row + i][col] = currentShipIndex + 1; // Mark the ship index
                         }
                     }
                     computerShipsRemaining += shipSize;
+                    currentShipIndex++;
                     placed = true;
                 }
             }
         }
+        currentShipIndex = 0; // Reset for player ship placement
     }
 
     private boolean canPlaceShip(int[][] ships, int row, int col, int shipSize, boolean horizontal) {
@@ -137,10 +139,13 @@ public class gui extends JFrame {
     }
 
     private void playerAttack(int row, int col) {
-        if (computerShips[row][col] == 1) {
+        if (computerShips[row][col] > 0) {
             computerGrid[row][col].setBackground(Color.RED);
-            computerShips[row][col] = -1;
+            computerShips[row][col] = -computerShips[row][col];
             computerShipsRemaining--;
+            if (isShipSunk(computerShips, row, col)) {
+                markShipAsSunk(computerGrid, computerShips, row, col);
+            }
             checkWin();
         } else if (computerShips[row][col] == 0) {
             computerGrid[row][col].setBackground(Color.WHITE);
@@ -155,16 +160,42 @@ public class gui extends JFrame {
         while (!validAttack) {
             int row = random.nextInt(GRID_SIZE);
             int col = random.nextInt(GRID_SIZE);
-            if (playerShips[row][col] == 1) {
+            if (playerShips[row][col] > 0) {
                 playerGrid[row][col].setBackground(Color.RED);
-                playerShips[row][col] = -1;
+                playerShips[row][col] = -playerShips[row][col];
                 playerShipsRemaining--;
+                if (isShipSunk(playerShips, row, col)) {
+                    markShipAsSunk(playerGrid, playerShips, row, col);
+                }
                 validAttack = true;
                 checkWin();
             } else if (playerShips[row][col] == 0) {
                 playerGrid[row][col].setBackground(Color.WHITE);
                 playerShips[row][col] = -1;
                 validAttack = true;
+            }
+        }
+    }
+
+    private boolean isShipSunk(int[][] ships, int row, int col) {
+        int shipIndex = -ships[row][col];
+        for (int r = 0; r < GRID_SIZE; r++) {
+            for (int c = 0; c < GRID_SIZE; c++) {
+                if (ships[r][c] == shipIndex) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    private void markShipAsSunk(JButton[][] grid, int[][] ships, int row, int col) {
+        int shipIndex = -ships[row][col];
+        for (int r = 0; r < GRID_SIZE; r++) {
+            for (int c = 0; c < GRID_SIZE; c++) {
+                if (ships[r][c] == shipIndex*-1) {
+                    grid[r][c].setBackground(Color.BLACK);
+                }
             }
         }
     }
